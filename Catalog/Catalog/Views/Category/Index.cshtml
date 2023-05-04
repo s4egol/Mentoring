@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Catalog.Models.CategoryViewModel>
+@{
+    ViewData["Title"] = "Categories list";
+}
+
+<div>
+    <h1 class="display-4">Categories</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Image</th>
+                <th scope="col">Parent ID</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in (Model ?? Array.Empty<CategoryViewModel>()))
+            {
+                <tr>
+                    <th scope="col">
+                        @Html.DisplayFor(moduleItem => item.Id)
+                    </th>
+                    <th scope="col">
+                        @Html.DisplayFor(moduleItem => item.Name)
+                    </th>
+                    <th scope="col">
+                        <img src="@item.Image" class="img-fluid" alt="Absent" height="50" width="50">
+                    </th>
+                    <th scope="col">
+                        @if (item.Parent != null)
+                        {
+                            @Html.DisplayFor(moduleItem => item.Parent.Id)
+                        }
+                    </th>
+                    <th scope="col">
+                        @Html.ActionLink("Edit", "Details", "Category", new { id = item.Id }, new { @class="btn btn-primary" })
+                        @Html.ActionLink("Delete", "Delete", "Category", new { id = item.Id }, new { @class="btn btn-danger" })
+                    </th>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

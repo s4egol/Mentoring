@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Catalog.Models.ProductViewModel>
+@{
+    ViewData["Title"] = "Products list";
+}
+
+<div>
+    <h1 class="display-4">Products</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Image</th>
+                <th scope="col">Price</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Category ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in (Model ?? Array.Empty<ProductViewModel>()))
+            {
+                <tr>
+                    <th scope="col">
+                        @Html.DisplayFor(moduleItem => item.Id)
+                    </th>
+                    <th scope="col">
+                        @Html.DisplayFor(moduleItem => item.Name)
+                    </th>
+                    <th scope="col">
+                        @Html.DisplayFor(moduleItem => item.Description)
+                    </th>
+                    <th scope="col">
+                        <img src="@item.Image" class="img-fluid" alt="Absent" height="50" width="50">
+                    </th>
+                    <th scope="col">
+                        @Html.DisplayFor(moduleItem => item.Price)
+                    </th>
+                    <th scope="col">
+                        @Html.DisplayFor(moduleItem => item.Amount)
+                    </th>
+                    <th scope="col">
+                        @if (item.CategoryId.HasValue)
+                        {
+                            @Html.DisplayFor(moduleItem => item.CategoryId.Value)
+                        }
+                    </th>
+                    <th scope="col">
+                        @Html.ActionLink("Edit", "Details", "Product", new { id = item.Id }, new { @class="btn btn-primary" })
+                        @Html.ActionLink("Delete", "Delete", "Product", new { id = item.Id }, new { @class="btn btn-danger" })
+                    </th>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

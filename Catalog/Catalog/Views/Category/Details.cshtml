@@ -1,0 +1,24 @@
+﻿@model Catalog.Models.CategoryViewModel
+@{
+    ViewData["Title"] = "Category editing";
+}
+
+<div>
+    <h2>Category editing</h2>
+    @using (Html.BeginForm("Edit", "Category", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+        <div class="mb-3">
+            @Html.LabelFor(model => model.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @placeholder = "Category name", @required = true })
+        </div>
+        <div class="mb-3">
+            @Html.LabelFor(model => model.Image, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.Image, new { @class = "form-control", @type = "url", @placeholder = "Image url" })
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    }
+</div>

@@ -1,0 +1,36 @@
+﻿@model Catalog.Models.ProductViewModel
+@{
+    ViewData["Title"] = "Product description";
+}
+
+<div>
+    <h2>Product details</h2>
+    @Html.HiddenFor(model => model.Id)
+    <div class="mb-3">
+        @Html.LabelFor(model => model.Name, new { @class = "form-label" })
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @readonly = true })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(model => model.Description, new { @class = "form-label" })
+        @Html.TextBoxFor(model => model.Description, new { @class = "form-control", @readonly = true })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(model => model.Image, new { @class = "form-label" })
+        @Html.TextBoxFor(model => model.Image, new { @class = "form-control", @type = "url", @readonly = true })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(model => model.Price, new { @class = "form-label" })
+        @Html.TextBoxFor(model => model.Price, new { @class = "form-control", @readonly = true })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(model => model.Amount, new { @class = "form-label" })
+        @Html.TextBoxFor(model => model.Amount, new { @class = "form-control", @readonly = true })
+    </div>
+    @if (Model.Category != null)
+    {
+        <div class="mb-3">
+            @Html.LabelFor(model => model.Category, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.Category.Name, new { @class = "form-control", @readonly = true })
+        </div>
+    }
+</div>
