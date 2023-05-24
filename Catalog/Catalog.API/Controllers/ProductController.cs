@@ -6,6 +6,7 @@ using Catalog.Business.Exceptions;
 using Catalog.Business.Interfaces;
 using Catalog.Business.Models;
 using Catalog.Business.Models.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.Swagger.Annotations;
 
@@ -25,10 +26,15 @@ namespace Catalog.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Viewers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [SwaggerResponse(StatusCodes.Status200OK, "Products were loaded")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad input")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> GetAll([FromQuery] ProductQuery query)
         {
             if (query == null)
@@ -50,12 +56,17 @@ namespace Catalog.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "Editors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [SwaggerResponse(StatusCodes.Status200OK, "Product was added")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Category wasn't found")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad input")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> Add(ProductContentViewModel productContent)
         {
             if (productContent == null)
@@ -76,15 +87,25 @@ namespace Catalog.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Policy = "Editors")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public Task Delete(int id) => _productService.DeleteAsync(id);
 
         [HttpPut]
+        [Authorize(Policy = "Editors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [SwaggerResponse(StatusCodes.Status200OK, "Product was updated")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Product or category wasn't found")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad input")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> Update(ProductViewModel product)
         {
             if (product == null)

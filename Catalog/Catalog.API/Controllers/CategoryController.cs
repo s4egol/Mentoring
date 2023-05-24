@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using Catalog.API.Helpers;
 using Catalog.API.Models.Category;
 using Catalog.Business.Exceptions;
 using Catalog.Business.Interfaces;
 using Catalog.Business.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.Swagger.Annotations;
+using System.Data;
 
 namespace Catalog.API.Controllers
 {
@@ -22,10 +25,17 @@ namespace Catalog.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Viewers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [SwaggerResponse(StatusCodes.Status200OK, "Categories were loaded")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> GetAll()
         {
+            var model = new ClaimManager(HttpContext, User);
+
             var categories = (await _categoryService.GetAllAsync())
                 .Select(_mapper.Map<CategoryViewModel>);
 
@@ -33,12 +43,17 @@ namespace Catalog.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "Editors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [SwaggerResponse(StatusCodes.Status200OK, "Category was added")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Parent category wasn't find")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad input")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> Add(CategoryContentViewModel categoryContent)
         {
             if (categoryContent == null)
@@ -59,12 +74,17 @@ namespace Catalog.API.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = "Editors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [SwaggerResponse(StatusCodes.Status200OK, "Category was updated")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Category wasn't find")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad input")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> Update(CategoryViewModel category)
         {
             if (category == null)
@@ -90,12 +110,17 @@ namespace Catalog.API.Controllers
         /// <param name="id">Category id that need to delete</param>
         /// <returns>code response</returns>
         [HttpDelete]
+        [Authorize(Policy = "Editors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [SwaggerResponse(StatusCodes.Status200OK, "Category was deleted")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Category wasn't find")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad input")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
