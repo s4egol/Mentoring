@@ -8,8 +8,7 @@ namespace Identity
         public static IEnumerable<ApiScope> ApiScopes =>
             new List<ApiScope>
             {
-                new ApiScope("catalog-swagger-API", "Catalog swagger API"),
-                new ApiScope("cart-swagger-API", "Cart swagger API")
+                new ApiScope("swagger-API", "Swagger API")
             };
 
         public static IEnumerable<IdentityResource> IdentityResources =>
@@ -22,13 +21,9 @@ namespace Identity
         public static IEnumerable<ApiResource> ApiResources =>
             new List<ApiResource>
             {
-                new ApiResource("catalog-swagger-API")
+                new ApiResource("swagger-API")
                 {
-                    Scopes = { "catalog-swagger-API" }
-                },
-                new ApiResource("cart-swagger-API")
-                {
-                    Scopes = { "cart-swagger-API" }
+                    Scopes = { "swagger-API" }
                 }
             };
 
@@ -37,36 +32,21 @@ namespace Identity
             {
                 new()
                 {
-                    ClientId = "catalog-swagger-api-client-id",
+                    ClientId = "swagger-api-client-id",
                     AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                     RequireClientSecret = false,
                     AllowedCorsOrigins =
                     {
-                        "https://localhost:3333"
+                        "https://localhost:3333",
+                        "https://localhost:4444"
                     },
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
-                        "catalog-swagger-API"
+                        "swagger-API"
                     }
                 },
-                new()
-                {
-                    ClientId = "cart-swagger-api-client-id",
-                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                    RequireClientSecret = false,
-                    AllowedCorsOrigins =
-                    {
-                        "https://localhost:7777"
-                    },
-                    AllowedScopes =
-                    {
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
-                        "cart-swagger-API"
-                    }
-                }
             };
     }
 }

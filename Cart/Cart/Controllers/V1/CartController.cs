@@ -2,12 +2,14 @@
 using Cart.Business.Interfaces;
 using Cart.Business.Models;
 using Cart.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Cart.Controllers.V1
 {
     [ApiController]
+    [Authorize(Policy = "Viewers")]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/cart-management")]
     public class CartController : ControllerBase

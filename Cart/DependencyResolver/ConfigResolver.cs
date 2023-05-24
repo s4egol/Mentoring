@@ -13,7 +13,6 @@ namespace DependencyResolver
         public static IServiceCollection ConfigureServices(this IServiceCollection services)
         {
             services.AddScoped<ICartingService, CartingService>();
-            services.AddHostedService<RabbitMqListener>();
 
             return services;
         }

@@ -1,12 +1,9 @@
 using Catalog.Business.Configuration.Settings;
 using DependencyResolver;
 using IdentityServer4.AccessTokenValidation;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ORM.Context;
-using System.Runtime;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,7 +39,7 @@ builder.Services.AddSwaggerGen(options =>
                 TokenUrl = new Uri("https://localhost:11111/connect/token"),
                 Scopes = new Dictionary<string, string>
                 {
-                    { "catalog-swagger-API", "Catalog swagger API" }
+                    { "swagger-API", "Swagger API" }
                 },
             }
         }
@@ -74,7 +71,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = IdentityServerAuthenticationDefaults.AuthenticationScheme;
 }).AddIdentityServerAuthentication(options =>
 {
-    options.ApiName = "catalog-swagger-API";
+    options.ApiName = "swagger-API";
     options.Authority = "https://localhost:11111";
     options.RequireHttpsMetadata = false;
     options.LegacyAudienceValidation = false;
@@ -103,7 +100,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.OAuthClientId("catalog-swagger-api-client-id");
+        options.OAuthClientId("swagger-api-client-id");
     });
 }
 
