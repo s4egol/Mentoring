@@ -7,8 +7,10 @@ namespace Catalog.API.Helpers
     {
         public ClaimManager(HttpContext context, ClaimsPrincipal user)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             Items = new List<ClaimViewer>();
+
             var claims = user.Claims.ToList();
 
             var idTokenJson = context.GetTokenAsync("id_token").GetAwaiter().GetResult();
@@ -31,7 +33,9 @@ namespace Catalog.API.Helpers
                 {
                     throw new InvalidOperationException("Not tokens found");
                 }
+
                 var token = Items.SingleOrDefault(x => x.Name == "Access Token");
+                
                 if (token == null)
                 {
                     throw new InvalidOperationException("Not tokens found");
@@ -49,7 +53,9 @@ namespace Catalog.API.Helpers
                 {
                     throw new InvalidOperationException("Not tokens found");
                 }
+
                 var token = Items.SingleOrDefault(x => x.Name == "Refresh Token");
+                
                 if (token == null)
                 {
                     throw new InvalidOperationException("Not tokens found");
@@ -65,6 +71,7 @@ namespace Catalog.API.Helpers
             {
                 return;
             }
+
             Items.Add(new ClaimViewer(nameToken, idTokenJson, skipParsing));
         }
 
