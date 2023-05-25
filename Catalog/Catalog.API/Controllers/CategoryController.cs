@@ -34,8 +34,6 @@ namespace Catalog.API.Controllers
         [SwaggerResponse(StatusCodes.Status403Forbidden, "User doesn't have suitable role")]
         public async Task<IActionResult> GetAll()
         {
-            var model = new ClaimManager(HttpContext, User);
-
             var categories = (await _categoryService.GetAllAsync())
                 .Select(_mapper.Map<CategoryViewModel>);
 
