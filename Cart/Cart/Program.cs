@@ -1,5 +1,6 @@
 using Cart.Business.Configuration.Settings;
 using Cart.Configuration;
+using Cart.Middlewares;
 using DependencyResolver;
 using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -125,6 +126,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAccessTokenMiddleware();
 
 app.UseAuthorization();
 
