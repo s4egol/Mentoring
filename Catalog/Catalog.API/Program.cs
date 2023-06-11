@@ -1,3 +1,4 @@
+using Catalog.API.Middlewares;
 using Catalog.Business.Configuration.Settings;
 using DependencyResolver;
 using IdentityServer4.AccessTokenValidation;
@@ -92,7 +93,11 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+
 var app = builder.Build();
+
+app.UseCorrelationIdMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

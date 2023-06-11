@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Cart.Extensions;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Cart.Middlewares
 {

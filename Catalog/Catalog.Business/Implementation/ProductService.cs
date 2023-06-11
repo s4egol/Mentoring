@@ -6,6 +6,7 @@ using Catalog.Business.Models;
 using Catalog.Business.Models.Queries;
 using Catalog.DataAccess.Interfaces;
 using Catalog.DataAccess.Models.Filters;
+using Microsoft.Extensions.Logging;
 using ORM.Entities;
 
 namespace Catalog.Business.Implementation
@@ -16,16 +17,19 @@ namespace Catalog.Business.Implementation
         private readonly IRabbitMqService _rabbitMqService;
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProductService> _logger;
 
         public ProductService(IUnitOfWork unitOfWork,
             IRabbitMqService rabbitMqService,
             AppSettings appSettings,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<ProductService> logger)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _rabbitMqService = rabbitMqService ?? throw new ArgumentNullException(nameof(rabbitMqService));
             _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task AddAsync(ProductEntity entity)
@@ -55,7 +59,13 @@ namespace Catalog.Business.Implementation
 
         public async Task<ProductEntity> GetAsync(int id)
         {
-            var product = await _unitOfWork.ProductRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException(nameof(id));
+            var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
+            
+            if (product == null)
+            {
+                _logger.LogError($"Product with ID: {id} wasn't find");
+                throw new KeyNotFoundException(nameof(id));
+            }
 
             return _mapper.Map<ProductEntity>(product);
         }
@@ -74,11 +84,13 @@ namespace Catalog.Business.Implementation
 
             if (!await _unitOfWork.ProductRepository.IsExistsAsync(product.Id))
             {
+                _logger.LogError($"Product with ID: {product.Id} wasn't find");
                 throw new EntityNotFountException(nameof(product.Id));
             }
 
             if (product.CategoryId.HasValue && !await IsCategoryExistsAsync(product.CategoryId.Value))
             {
+                _logger.LogError($"Category with ID: {product.CategoryId.Value} wasn't find");
                 throw new EntityNotFountException(nameof(product.CategoryId.Value));
             }
         }
@@ -89,6 +101,7 @@ namespace Catalog.Business.Implementation
 
             if (product.CategoryId.HasValue && !await IsCategoryExistsAsync(product.CategoryId.Value))
             {
+                _logger.LogError($"Category with ID: {product.CategoryId.Value} wasn't find");
                 throw new EntityNotFountException(nameof(product.CategoryId.Value));
             }
         }
@@ -105,6 +118,7 @@ namespace Catalog.Business.Implementation
             }
             catch(Exception ex)
             {
+                _logger.LogError(ex, $"Error sending message in queue");
                 throw new Exception("Rebbit Mq Server isn't available", ex);
             }
         }

@@ -18,11 +18,15 @@ namespace Catalog.API.Controllers
     {
         private readonly IProductService _productService;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProductController> _logger;
 
-        public ProductController(IProductService productService, IMapper mapper)
+        public ProductController(IProductService productService,
+            IMapper mapper,
+            ILogger<ProductController> logger)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
@@ -39,6 +43,7 @@ namespace Catalog.API.Controllers
         {
             if (query == null)
             {
+                _logger.LogError($"Wrong input: {nameof(query)}: {query}");
                 return BadRequest();
             }
 
@@ -71,6 +76,7 @@ namespace Catalog.API.Controllers
         {
             if (productContent == null)
             {
+                _logger.LogError($"Wrong input: {nameof(productContent)}: {productContent}");
                 return BadRequest();
             }
 
@@ -80,6 +86,7 @@ namespace Catalog.API.Controllers
             }
             catch (EntityNotFountException)
             {
+                _logger.LogError($"Error adding new product in catalog");
                 return NotFound();
             }
 
@@ -110,6 +117,7 @@ namespace Catalog.API.Controllers
         {
             if (product == null)
             {
+                _logger.LogError($"Wrong input: {nameof(product)}: {product}");
                 return BadRequest();
             }
 
@@ -119,6 +127,7 @@ namespace Catalog.API.Controllers
             }
             catch (EntityNotFountException)
             {
+                _logger.LogError($"Error updating product with ID: {product.Id}");
                 return NotFound();
             }
 

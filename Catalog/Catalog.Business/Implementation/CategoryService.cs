@@ -3,6 +3,7 @@ using Catalog.Business.Exceptions;
 using Catalog.Business.Interfaces;
 using Catalog.Business.Models;
 using Catalog.DataAccess.Interfaces;
+using Microsoft.Extensions.Logging;
 using ORM.Entities;
 
 namespace Catalog.Business.Implementation
@@ -11,16 +12,26 @@ namespace Catalog.Business.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILogger<CategoryService> _logger;
 
-        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CategoryService(IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ILogger<CategoryService> logger)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<CategoryEntity> GetByIdAsync(int id)
         {
-            var category = await _unitOfWork.CategoryRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException(nameof(id));
+            var category = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
+            
+            if (category == null)
+            {
+                _logger.LogError($"Category with ID: {id} wasn't find");
+                throw new KeyNotFoundException(nameof(id));
+            }
 
             return _mapper.Map<CategoryEntity>(category);
         }
@@ -31,6 +42,7 @@ namespace Catalog.Business.Implementation
 
             if (category == null)
             {
+                _logger.LogError($"Category with ID: {id} wasn't find");
                 throw new EntityNotFountException(nameof(id));
             }
 
@@ -99,6 +111,7 @@ namespace Catalog.Business.Implementation
 
             if (!await _unitOfWork.CategoryRepository.IsExistsAsync(entity.Id))
             {
+                _logger.LogError($"Category with ID: {entity.Id} wasn't find");
                 throw new EntityNotFountException(nameof(entity));
             }
 
@@ -112,11 +125,13 @@ namespace Catalog.Business.Implementation
         {
             if (entity.Id == entity.ParentId)
             {
+                _logger.LogError($"An entity cannot be a parent to itself");
                 throw new Exception("An entity cannot be a parent to itself");
             }
 
             if (!await _unitOfWork.CategoryRepository.IsExistsAsync(entity.ParentId.Value))
             {
+                _logger.LogError($"Parent category wuth ID: {entity.ParentId.Value} doesn't exist");
                 throw new EntityNotFountException(nameof(entity.ParentId));
             }
         }

@@ -15,11 +15,15 @@ namespace Cart.Controllers.V2
     {
         private readonly ICartingService _cartingService;
         private readonly IMapper _mapper;
+        private readonly ILogger<CartController> _logger;
 
-        public CartController(ICartingService cartingService, IMapper mapper)
+        public CartController(ICartingService cartingService,
+            IMapper mapper,
+            ILogger<CartController> logger)
         {
             _cartingService = cartingService ?? throw new ArgumentNullException(nameof(cartingService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
@@ -34,6 +38,7 @@ namespace Cart.Controllers.V2
         {
             if (string.IsNullOrWhiteSpace(cartId))
             {
+                _logger.LogError($"Wrong input: {nameof(cartId)}: {cartId}");
                 return BadRequest();
             }
 
@@ -47,6 +52,7 @@ namespace Cart.Controllers.V2
             }
             catch (Exception)
             {
+                _logger.LogError("Error of cart's items processing.");
                 return BadRequest();
             }
 

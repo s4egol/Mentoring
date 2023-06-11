@@ -26,11 +26,12 @@ namespace RabbitMQ
                 autoDelete: false,
                 arguments: null);
 
+            var props = channel.CreateBasicProperties();
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj));
 
             channel.BasicPublish(exchange: string.Empty,
                 routingKey: queue,
-                basicProperties: null,
+                basicProperties: props,
                 body: body);
         }
     }

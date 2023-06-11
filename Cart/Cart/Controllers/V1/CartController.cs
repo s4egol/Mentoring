@@ -4,6 +4,7 @@ using Cart.Business.Models;
 using Cart.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NoSql.Models;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Cart.Controllers.V1
@@ -16,11 +17,15 @@ namespace Cart.Controllers.V1
     {
         private readonly ICartingService _cartingService;
         private readonly IMapper _mapper;
+        private readonly ILogger<CartController> _logger;
 
-        public CartController(ICartingService cartingService, IMapper mapper)
+        public CartController(ICartingService cartingService,
+            IMapper mapper,
+            ILogger<CartController> logger)
         {
             _cartingService = cartingService ?? throw new ArgumentNullException(nameof(cartingService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpPost]
@@ -36,6 +41,7 @@ namespace Cart.Controllers.V1
         {
             if (string.IsNullOrWhiteSpace(cartId) || productItem == null)
             {
+                _logger.LogError($"Wrong input: {productItem}. {nameof(productItem)} or {nameof(cartId)} can't be null.");
                 return BadRequest();
             }
 
@@ -45,6 +51,7 @@ namespace Cart.Controllers.V1
             }
             catch (Exception)
             {
+                _logger.LogError("Error of adding product to cart");
                 return BadRequest();
             }
 
@@ -64,6 +71,7 @@ namespace Cart.Controllers.V1
         {
             if (string.IsNullOrWhiteSpace(cartId) || productId <= 0)
             {
+                _logger.LogError($"Wrong input: {nameof(cartId)}: {cartId} or {nameof(productId)}: {productId}.");
                 return BadRequest();
             }
 
@@ -84,6 +92,7 @@ namespace Cart.Controllers.V1
         {
             if (string.IsNullOrWhiteSpace(cartId))
             {
+                _logger.LogError($"Wrong input: {nameof(cartId)}: {cartId}.");
                 return BadRequest();
             }
 
@@ -97,6 +106,7 @@ namespace Cart.Controllers.V1
             }
             catch (Exception)
             {
+                _logger.LogError("Error of cart's items processing.");
                 return BadRequest();
             }
 

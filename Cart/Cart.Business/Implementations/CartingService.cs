@@ -2,6 +2,7 @@
 using Cart.Business.Interfaces;
 using Cart.Business.Models;
 using Cart.DataAccess.Interfaces;
+using Microsoft.Extensions.Logging;
 using NoSql.Models;
 
 namespace Cart.Business.Implementations
@@ -11,14 +12,17 @@ namespace Cart.Business.Implementations
         private readonly IProductItemRepository _productItemRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<CartingService> _logger;
 
         public CartingService(IProductItemRepository productItemRepository,
             ICartRepository cartRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<CartingService> logger)
         {
             _productItemRepository = productItemRepository ?? throw new ArgumentNullException(nameof(productItemRepository));
             _cartRepository = cartRepository ?? throw new ArgumentNullException(nameof(cartRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void AddItem(string cartId, ProductItemEntity item)
@@ -34,6 +38,7 @@ namespace Cart.Business.Implementations
 
             if (cart == null)
             {
+                _logger.LogError($"Cart with ID: {cartId} wasn't found");
                 throw new Exception($"Cart with ID: {cartId} wasn't found");
             }
 
@@ -63,6 +68,7 @@ namespace Cart.Business.Implementations
 
             if (cart == null)
             {
+                _logger.LogError($"Cart with ID: {cartId} wasn't found");
                 throw new Exception($"Cart with ID: {cartId} wasn't found");
             }
 

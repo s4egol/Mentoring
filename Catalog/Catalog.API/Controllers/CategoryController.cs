@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Catalog.API.Helpers;
 using Catalog.API.Models.Category;
 using Catalog.Business.Exceptions;
 using Catalog.Business.Interfaces;
 using Catalog.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ORM.Entities;
 using Swashbuckle.Swagger.Annotations;
 using System.Data;
 
@@ -17,11 +17,15 @@ namespace Catalog.API.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
+        private readonly ILogger<CategoryController> _logger;
 
-        public CategoryController(ICategoryService categoryService, IMapper mapper)
+        public CategoryController(ICategoryService categoryService,
+            IMapper mapper,
+            ILogger<CategoryController> logger)
         {
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
@@ -56,6 +60,7 @@ namespace Catalog.API.Controllers
         {
             if (categoryContent == null)
             {
+                _logger.LogError($"Wrong input: {nameof(categoryContent)}: {categoryContent}");
                 return BadRequest();
             }
 
@@ -65,6 +70,7 @@ namespace Catalog.API.Controllers
             }
             catch (EntityNotFountException)
             {
+                _logger.LogError("Error adding new category");
                 return NotFound();
             }
 
@@ -87,6 +93,7 @@ namespace Catalog.API.Controllers
         {
             if (category == null)
             {
+                _logger.LogError($"Wrong input: {nameof(category)}: {category}");
                 return BadRequest();
             }
 
@@ -96,6 +103,7 @@ namespace Catalog.API.Controllers
             }
             catch (EntityNotFountException)
             {
+                _logger.LogError($"Error updating category with ID: {category.Id}");
                 return NotFound();
             }
 
@@ -123,6 +131,7 @@ namespace Catalog.API.Controllers
         {
             if (id <= 0)
             {
+                _logger.LogError($"Wrong input: {nameof(id)}: {id}");
                 return BadRequest();
             }
 
@@ -132,6 +141,7 @@ namespace Catalog.API.Controllers
             }
             catch (EntityNotFountException)
             {
+                _logger.LogError($"Error deleting category with ID: {id}");
                 return NotFound();
             }
 
