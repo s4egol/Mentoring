@@ -1,31 +1,35 @@
-﻿using Identity.Data.Configurations;
+﻿// Copyright © 2023 EPAM Systems, Inc. All Rights Reserved. All information contained herein is, and remains the
+// property of EPAM Systems, Inc. and/or its suppliers and is protected by international intellectual
+// property law. Dissemination of this information or reproduction of this material is strictly forbidden,
+// unless prior written permission is obtained from EPAM Systems, Inc
+
+using Identity.Data.Configurations;
 using Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.Data
+namespace Identity.Data;
+
+public class AuthDbContext : IdentityDbContext<AppUser>
 {
-    public class AuthDbContext : IdentityDbContext<AppUser>
+    public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
     {
-        public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
-        {
-            Database.EnsureCreated();
-        }
+        Database.EnsureCreated();
+    }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
 
-            builder.Entity<AppUser>(entity => entity.ToTable(name: "Users"));
-            builder.Entity<IdentityRole>(entity => entity.ToTable(name: "Roles"));
-            builder.Entity<IdentityUserRole<string>>(entity => entity.ToTable(name: "UserRoles"));
-            builder.Entity<IdentityUserClaim<string>>(entity => entity.ToTable(name: "UserClaims"));
-            builder.Entity<IdentityUserLogin<string>>(entity => entity.ToTable(name: "UserLogins"));
-            builder.Entity<IdentityUserToken<string>>(entity => entity.ToTable(name: "UserTokens"));
-            builder.Entity<IdentityRoleClaim<string>>(entity => entity.ToTable(name: "RoleClaims"));
+        builder.Entity<AppUser>(entity => entity.ToTable(name: "Users"));
+        builder.Entity<IdentityRole>(entity => entity.ToTable(name: "Roles"));
+        builder.Entity<IdentityUserRole<string>>(entity => entity.ToTable(name: "UserRoles"));
+        builder.Entity<IdentityUserClaim<string>>(entity => entity.ToTable(name: "UserClaims"));
+        builder.Entity<IdentityUserLogin<string>>(entity => entity.ToTable(name: "UserLogins"));
+        builder.Entity<IdentityUserToken<string>>(entity => entity.ToTable(name: "UserTokens"));
+        builder.Entity<IdentityRoleClaim<string>>(entity => entity.ToTable(name: "RoleClaims"));
 
-            builder.ApplyConfiguration(new AppUserConfiguration());
-        }
+        builder.ApplyConfiguration(new AppUserConfiguration());
     }
 }

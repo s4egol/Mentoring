@@ -1,17 +1,21 @@
-﻿using AutoMapper;
+﻿// Copyright © 2023 EPAM Systems, Inc. All Rights Reserved. All information contained herein is, and remains the
+// property of EPAM Systems, Inc. and/or its suppliers and is protected by international intellectual
+// property law. Dissemination of this information or reproduction of this material is strictly forbidden,
+// unless prior written permission is obtained from EPAM Systems, Inc
+
+using AutoMapper;
 using Cart.Business.Models;
 using NoSql.Models;
 
-namespace Cart.Business.AutoMappers
+namespace Cart.Business.AutoMappers;
+
+public class ProductItemMapping : Profile
 {
-    public class ProductItemMapping : Profile
+    public ProductItemMapping()
     {
-        public ProductItemMapping()
-        {
-            CreateMap<ProductItem, ProductItemEntity>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId));
-            CreateMap<ProductItemEntity, ProductItem>()
-                .ForMember(dest => dest.ExternalId, opt => opt.MapFrom(src => src.Id));
-        }
+        CreateMap<ProductItem, ProductItemEntity>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId));
+        CreateMap<ProductItemEntity, ProductItem>()
+            .ForMember(dest => dest.ExternalId, opt => opt.MapFrom(src => src.Id));
     }
 }

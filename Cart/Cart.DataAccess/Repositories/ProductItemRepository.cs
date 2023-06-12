@@ -1,73 +1,77 @@
-﻿using Cart.DataAccess.Interfaces;
+﻿// Copyright © 2023 EPAM Systems, Inc. All Rights Reserved. All information contained herein is, and remains the
+// property of EPAM Systems, Inc. and/or its suppliers and is protected by international intellectual
+// property law. Dissemination of this information or reproduction of this material is strictly forbidden,
+// unless prior written permission is obtained from EPAM Systems, Inc
+
+using Cart.DataAccess.Interfaces;
 using NoSql.Context;
 using NoSql.Models;
 
-namespace Cart.DataAccess.Repositories
+namespace Cart.DataAccess.Repositories;
+
+public class ProductItemRepository : IProductItemRepository
 {
-    public class ProductItemRepository : IProductItemRepository
+    public readonly CartContext _dbContext;
+
+    public ProductItemRepository(CartContext dbContext)
     {
-        public readonly CartContext _dbContext;
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    }
 
-        public ProductItemRepository(CartContext dbContext)
+    public void Add(ProductItem productItem)
+    {
+        ArgumentNullException.ThrowIfNull(productItem, nameof(productItem));
+
+        _dbContext.ProductItems.Add(productItem);
+    }
+
+    public void UpdateRange(IEnumerable<ProductItem> productItems)
+    {
+        var productItemIds = productItems.Select(productItem => productItem.ExternalId);
+        var products = _dbContext.ProductItems
+            .Where(product => productItemIds.Contains(product.ExternalId))
+            .GroupBy(product => product.ExternalId)
+            .ToDictionary(products => products.Key, products => products.ToArray());
+
+        if (!products.Any())
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            return;
         }
 
-        public void Add(ProductItem productItem)
+        foreach (var productItem in productItems)
         {
-            ArgumentNullException.ThrowIfNull(productItem, nameof(productItem));
+            var dbProducts = products.GetValueOrDefault(productItem.ExternalId) ?? Array.Empty<ProductItem>();
 
-            _dbContext.ProductItems.Add(productItem);
-        }
-
-        public void UpdateRange(IEnumerable<ProductItem> productItems)
-        {
-            var productItemIds = productItems.Select(productItem => productItem.ExternalId);
-            var products = _dbContext.ProductItems
-                .Where(product => productItemIds.Contains(product.ExternalId))
-                .GroupBy(product => product.ExternalId)
-                .ToDictionary(products => products.Key, products => products.ToArray());
-
-            if (!products.Any())
+            foreach (var dbProduct in dbProducts)
             {
-                return;
+                dbProduct.Name = productItem.Name;
+                dbProduct.Price = productItem.Price;
+                dbProduct.Quantity = productItem.Quantity;
             }
-
-            foreach (var productItem in productItems)
-            {
-                var dbProducts = products.GetValueOrDefault(productItem.ExternalId) ?? Array.Empty<ProductItem>();
-
-                foreach (var dbProduct in dbProducts)
-                {
-                    dbProduct.Name = productItem.Name;
-                    dbProduct.Price = productItem.Price;
-                    dbProduct.Quantity = productItem.Quantity;
-                }
-            }
-
-            _dbContext.ProductItems.Update(products.SelectMany(product => product.Value));
         }
 
-        public void Delete(string cartId, int productItemId)
-        {
-            _dbContext.ProductItems
-                .DeleteExpression(x => x.ExternalId == productItemId && x.CartId == cartId);
-        }
+        _dbContext.ProductItems.Update(products.SelectMany(product => product.Value));
+    }
 
-        public IEnumerable<ProductItem> GetProductItems(string cartId)
-        {
-            var productItems = _dbContext.ProductItems
-                .Where(product => product.CartId == cartId);
+    public void Delete(string cartId, int productItemId)
+    {
+        _dbContext.ProductItems
+            .DeleteExpression(x => x.ExternalId == productItemId && x.CartId == cartId);
+    }
 
-            return productItems;
-        }
+    public IEnumerable<ProductItem> GetProductItems(string cartId)
+    {
+        var productItems = _dbContext.ProductItems
+            .Where(product => product.CartId == cartId);
 
-        public IEnumerable<ProductItem> GetProductItems(IEnumerable<int> productIds)
-        {
-            var productItems = _dbContext.ProductItems
-                .Where(product => productIds.Contains(product.ExternalId));
+        return productItems;
+    }
 
-            return productItems;
-        }
+    public IEnumerable<ProductItem> GetProductItems(IEnumerable<int> productIds)
+    {
+        var productItems = _dbContext.ProductItems
+            .Where(product => productIds.Contains(product.ExternalId));
+
+        return productItems;
     }
 }
