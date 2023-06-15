@@ -1,14 +1,18 @@
-﻿using Identity.Models;
+﻿// Copyright © 2023 EPAM Systems, Inc. All Rights Reserved. All information contained herein is, and remains the
+// property of EPAM Systems, Inc. and/or its suppliers and is protected by international intellectual
+// property law. Dissemination of this information or reproduction of this material is strictly forbidden,
+// unless prior written permission is obtained from EPAM Systems, Inc
+
+using Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Identity.Data.Configurations
+namespace Identity.Data.Configurations;
+
+public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
 {
-    public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
+    public void Configure(EntityTypeBuilder<AppUser> builder)
     {
-        public void Configure(EntityTypeBuilder<AppUser> builder)
-        {
-            builder.HasKey(x => x.Id);
-        }
+        builder.HasKey(x => x.Id);
     }
 }

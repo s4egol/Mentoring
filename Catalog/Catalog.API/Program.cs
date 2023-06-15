@@ -1,10 +1,16 @@
+﻿// Copyright © 2023 EPAM Systems, Inc. All Rights Reserved. All information contained herein is, and remains the
+// property of EPAM Systems, Inc. and/or its suppliers and is protected by international intellectual
+// property law. Dissemination of this information or reproduction of this material is strictly forbidden,
+// unless prior written permission is obtained from EPAM Systems, Inc
+
+using System.Security.Claims;
+using Catalog.API.Middlewares;
 using Catalog.Business.Configuration.Settings;
 using DependencyResolver;
 using IdentityServer4.AccessTokenValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ORM.Context;
-using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -92,7 +98,11 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+
 var app = builder.Build();
+
+app.UseCorrelationIdMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

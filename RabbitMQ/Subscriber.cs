@@ -30,6 +30,10 @@ namespace RabbitMQ
 
             consumer.Received += (ch, ea) =>
             {
+                var props = ea.BasicProperties;
+                var replyProps = _channel.CreateBasicProperties();
+                replyProps.CorrelationId = props.CorrelationId;
+
                 var content = Encoding.UTF8.GetString(ea.Body.ToArray());
 
                 messageProcessing(content);

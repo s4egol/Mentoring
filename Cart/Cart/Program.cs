@@ -1,3 +1,9 @@
+﻿// Copyright © 2023 EPAM Systems, Inc. All Rights Reserved. All information contained herein is, and remains the
+// property of EPAM Systems, Inc. and/or its suppliers and is protected by international intellectual
+// property law. Dissemination of this information or reproduction of this material is strictly forbidden,
+// unless prior written permission is obtained from EPAM Systems, Inc
+
+using System.Security.Claims;
 using Cart.Business.Configuration.Settings;
 using Cart.Configuration;
 using Cart.Middlewares;
@@ -9,10 +15,9 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new NullReferenceException(nameof(connectionString));
 
 // Add config options
 builder.Services.Configure<RabbitMqServerSettings>(builder.Configuration.GetSection("RabbitMqServerSettings"));
@@ -105,7 +110,11 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+
 var app = builder.Build();
+
+app.UseCorrelationIdMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
