@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Copyright © 2023 EPAM Systems, Inc. All Rights Reserved. All information contained herein is, and remains the
+// property of EPAM Systems, Inc. and/or its suppliers and is protected by international intellectual
+// property law. Dissemination of this information or reproduction of this material is strictly forbidden,
+// unless prior written permission is obtained from EPAM Systems, Inc
 
-namespace Catalog.API.Models.Category
+namespace Catalog.API.Models.Category;
+
+public class CategoryViewModel : CategoryContentViewModel
 {
-    public class CategoryViewModel : CategoryContentViewModel
-    {
-        public int Id { get; set; }
-        public CategoryViewModel? Parent { get; set; }
-    }
+    public int Id { get; set; }
+    public CategoryViewModel? Parent { get; set; }
 }
